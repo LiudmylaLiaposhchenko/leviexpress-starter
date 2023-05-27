@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './style.css';
 
-export const CityOptions = ({ state, setState, cities }) => {
+const CityOptions = ({ state, setState, cities }) => {
   return (
     <select
       onChange={(e) => {
@@ -19,14 +19,30 @@ export const CityOptions = ({ state, setState, cities }) => {
   );
 };
 
+const DatesOptions = ({ date, setDate, dates }) => {
+  return (
+    <select
+      onChange={(e) => {
+        setDate(e.target.value);
+      }}
+      value={date}
+    >
+      <option value="">Vyberte</option>
+      {dates.map((date) => (
+        <option key={date.dateBasic} value={date.dateBasic}>
+          {date.dateCs}
+        </option>
+      ))}
+    </select>
+  );
+};
+
 export const JourneyPicker = ({ onJourneyChange }) => {
   const [fromCity, setFromCity] = useState('');
   const [toCity, setToCity] = useState('');
   const [date, setDate] = useState('');
-  const [cities, setCities] = useState([
-    { name: 'Praha', code: 'CZ-PRG' },
-    { name: 'Brno', code: 'CZ-BRQ' },
-  ]);
+  const [dates, setDates] = useState([]);
+  const [cities, setCities] = useState([]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -36,6 +52,9 @@ export const JourneyPicker = ({ onJourneyChange }) => {
     fetch('https://apps.kodim.cz/daweb/leviexpress/api/cities')
       .then((response) => response.json())
       .then((data) => setCities(data.results));
+    fetch('https://apps.kodim.cz/daweb/leviexpress/api/dates')
+      .then((response) => response.json())
+      .then((data) => setDates(data.results));
   }, []);
 
   return (
@@ -57,20 +76,7 @@ export const JourneyPicker = ({ onJourneyChange }) => {
           </label>
           <label>
             <div className="journey-picker__label">Datum:</div>
-            <select
-              onChange={(e) => {
-                setDate(e.target.value);
-                console.log('d');
-              }}
-              value={date}
-            >
-              <option value="">Vyberte</option>
-              <option value="datum01">Datum 01</option>
-              <option value="datum02">Datum 02</option>
-              <option value="datum03">Datum 03</option>
-              <option value="datum04">Datum 04</option>
-              <option value="datum05">Datum 05</option>
-            </select>
+            <DatesOptions date={date} setDate={setDate} dates={dates} />
           </label>
           <div className="journey-picker__controls">
             <button className="btn" type="submit">
